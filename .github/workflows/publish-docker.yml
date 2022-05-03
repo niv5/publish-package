@@ -31,4 +31,4 @@ jobs:
         with:
           context: ./sample-packages/docker
           push: true
-          tags: user/app:latest
+          tags: ghcr.io/user/app:latest
