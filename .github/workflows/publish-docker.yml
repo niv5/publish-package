@@ -7,7 +7,7 @@ on:
   pull_request:
   
 env:
-  IMAGE_NAME: publish_package_demo
+  IMAGE_NAME: publish_package_docker
   
 jobs:
   docker:
