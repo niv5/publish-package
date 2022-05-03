@@ -25,10 +25,27 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set variables
+        id: vars
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          echo ::set-output name=image_id::$IMAGE_ID
+          echo ::set-output name=image_version::$VERSION
           
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./sample-packages/docker
           push: true
-          tags: ghcr.io/user/app:latest
+          tags: ${{ steps.vars.outputs.image_id }}:${{ steps.vars.outputs.image_version }}
